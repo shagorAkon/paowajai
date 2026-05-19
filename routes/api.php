@@ -1,0 +1,80 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+// --- Auth Controllers ---
+use App\Http\Controllers\Api\V1\AuthController;
+
+// --- Storefront Controllers ---
+use App\Http\Controllers\Api\V1\Storefront\HomeController;
+use App\Http\Controllers\Api\V1\Storefront\ProductController as StorefrontProductController;
+use App\Http\Controllers\Api\V1\Storefront\CategoryController as StorefrontCategoryController;
+use App\Http\Controllers\Api\V1\Storefront\CheckoutController;
+
+// --- Admin Controllers ---
+use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Api\V1\Admin\DashboardController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes (v1)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('v1')->group(function () {
+
+    // ========================================
+    // Authentication
+    // ========================================
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    // ========================================
+    // Public Storefront Routes
+    // ========================================
+    Route::prefix('storefront')->group(function () {
+        Route::get('/home', [HomeController::class, 'index']);
+        Route::get('/categories', [StorefrontCategoryController::class, 'index']);
+        Route::get('/categories/{slug}', [StorefrontCategoryController::class, 'show']);
+        Route::get('/products', [StorefrontProductController::class, 'index']);
+        Route::get('/products/featured', [StorefrontProductController::class, 'featured']);
+        Route::get('/products/flash-sale', [StorefrontProductController::class, 'flashSale']);
+        Route::get('/products/{slug}', [StorefrontProductController::class, 'show']);
+        Route::post('/checkout', [CheckoutController::class, 'store']);
+        Route::get('/payment/callback', [\App\Http\Controllers\Api\V1\Storefront\PaymentCallbackController::class, 'handleCallback']);
+    });
+
+    // ========================================
+    // Admin Routes (Authenticated + Admin Role)
+    // ========================================
+    Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+        Route::get('/dashboard/revenue-chart', [DashboardController::class, 'revenueChart']);
+        Route::get('/dashboard/top-products', [DashboardController::class, 'topProducts']);
+        Route::get('/dashboard/recent-orders', [DashboardController::class, 'recentOrders']);
+        Route::get('/dashboard/order-status-breakdown', [DashboardController::class, 'orderStatusBreakdown']);
+
+        // Categories
+        Route::apiResource('/categories', AdminCategoryController::class);
+
+        // Products
+        Route::apiResource('/products', AdminProductController::class);
+
+        // Orders
+        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
+        Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
+        Route::patch('/orders/{order}/tracking', [AdminOrderController::class, 'updateTracking']);
+        Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy']);
+    });
+});

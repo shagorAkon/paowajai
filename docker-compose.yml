@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # Laravel App FPM Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: paowajai-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - paowajai-network
+
+  # Queue Worker
+  queue:
+    image: paowajai-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - app
+    networks:
+      - paowajai-network
+
+  # Nginx Reverse Proxy
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - paowajai-network
+
+  # MySQL Database Server
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: paowajai
+      MYSQL_USER: paowajai_user
+      MYSQL_PASSWORD: secret_password
+      MYSQL_ROOT_PASSWORD: root_secret_password
+    volumes:
+      - paowajai-db-data:/var/lib/mysql
+    networks:
+      - paowajai-network
+
+  # Redis Cache & Queue Backend
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - paowajai-redis-data:/data
+    networks:
+      - paowajai-network
+
+networks:
+  paowajai-network:
+    driver: bridge
+
+volumes:
+  paowajai-db-data:
+    driver: local
+  paowajai-redis-data:
+    driver: local
