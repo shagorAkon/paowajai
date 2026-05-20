@@ -16,6 +16,11 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
+     * Eager load roles and permissions.
+     */
+    protected $with = ['roles'];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

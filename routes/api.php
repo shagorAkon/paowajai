@@ -49,6 +49,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/products/flash-sale', [StorefrontProductController::class, 'flashSale']);
         Route::get('/products/{slug}', [StorefrontProductController::class, 'show']);
         Route::post('/checkout', [CheckoutController::class, 'store']);
+        Route::get('/track-order/{order_number}', [CheckoutController::class, 'track']);
         Route::get('/payment/callback', [\App\Http\Controllers\Api\V1\Storefront\PaymentCallbackController::class, 'handleCallback']);
     });
 
@@ -76,5 +77,10 @@ Route::prefix('v1')->group(function () {
         Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
         Route::patch('/orders/{order}/tracking', [AdminOrderController::class, 'updateTracking']);
         Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy']);
+        Route::get('/orders/{order}/invoice', [\App\Http\Controllers\Api\V1\Admin\InvoiceController::class, 'download']);
+
+        // Settings
+        Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index']);
+        Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update']);
     });
 });
