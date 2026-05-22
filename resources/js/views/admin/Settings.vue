@@ -100,6 +100,30 @@
             </div>
           </div>
 
+          <!-- THEME SETTINGS -->
+          <div v-show="activeTab === 'theme'" class="space-y-6 animate-fade-in">
+            <h3 class="text-lg font-bold border-b dark:border-slate-700 pb-2">Global Store Theme</h3>
+            <div class="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div>
+                <h4 class="font-bold text-slate-900 dark:text-white text-lg">Dark Mode</h4>
+                <p class="text-slate-500 text-sm">Switch the entire storefront and dashboard to a luxury dark theme.</p>
+              </div>
+              <button 
+                @click="themeStore.toggleTheme" 
+                class="relative inline-flex h-8 w-14 items-center rounded-full transition-colors"
+                :class="themeStore.isDark ? 'bg-primary-500' : 'bg-slate-300 dark:bg-slate-700'"
+              >
+                <span 
+                  class="inline-block h-6 w-6 transform rounded-full bg-white transition-transform"
+                  :class="themeStore.isDark ? 'translate-x-7' : 'translate-x-1'"
+                ></span>
+              </button>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">
+              Note: Theme preference is saved locally on this device. Your customers will see the theme they prefer based on their system settings or manual choice.
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -109,6 +133,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../../utils/api';
+import { useThemeStore } from '../../stores/useThemeStore';
+
+const themeStore = useThemeStore();
 
 const loading = ref(false);
 const activeTab = ref('general');

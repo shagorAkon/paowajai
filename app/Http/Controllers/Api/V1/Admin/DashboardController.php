@@ -20,6 +20,9 @@ class DashboardController extends Controller
         $totalProducts = Product::count();
         $lowStockProducts = Product::lowStock()->count();
 
+        $processingOrders = Order::where('status', 'processing')->count();
+        $deliveredOrders = Order::where('status', 'delivered')->count();
+
         $todayRevenue = Order::where('payment_status', 'paid')
             ->whereDate('created_at', today())
             ->sum('total');
@@ -35,10 +38,32 @@ class DashboardController extends Controller
             'monthly_revenue' => $monthlyRevenue,
             'total_orders' => $totalOrders,
             'pending_orders' => $pendingOrders,
+            'processing_orders' => $processingOrders,
+            'delivered_orders' => $deliveredOrders,
             'total_customers' => $totalCustomers,
             'total_products' => $totalProducts,
             'low_stock_products' => $lowStockProducts,
         ]);
+    }
+
+    public function notifications(Request $request)
+    {
+        $user = auth('sanctum')->user();
+        $limit = $request->get('limit', 10);
+
+        return response()->json([
+            'unread_count' => $user->unreadNotifications->count(),
+            'notifications' => $user->notifications()->limit($limit)->get(),
+        ]);
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        $notification = auth('sanctum')->user()->notifications()->find($id);
+        if ($notification) {
+            $notification->markAsRead();
+        }
+        return response()->json(['success' => true]);
     }
 
     public function revenueChart(Request $request)

@@ -48,9 +48,17 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned,refunded',
+            'note' => 'nullable|string'
         ]);
 
-        $order->update(['status' => $validated['status']]);
+        if ($order->status !== $validated['status']) {
+            $order->update(['status' => $validated['status']]);
+            
+            $order->histories()->create([
+                'status' => $validated['status'],
+                'note' => $validated['note'] ?? 'Status updated to ' . $validated['status'] . '.'
+            ]);
+        }
 
         return response()->json($order);
     }

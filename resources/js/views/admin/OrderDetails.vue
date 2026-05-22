@@ -13,10 +13,10 @@
         <p class="text-slate-500 mt-2 ml-12">Placed on {{ new Date(order.created_at).toLocaleString() }}</p>
       </div>
       <div class="flex gap-3">
-        <a :href="`/api/v1/admin/orders/${order.id}/invoice`" target="_blank" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-          PDF Invoice
-        </a>
+        <button @click="downloadInvoice" :disabled="downloadingInvoice" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          {{ downloadingInvoice ? 'Generating...' : 'PDF Invoice' }}
+        </button>
       </div>
     </div>
 
@@ -143,6 +143,7 @@ const route = useRoute();
 const order = ref(null);
 const statusUpdate = ref('');
 const tracking = ref({ courier: '', number: '' });
+const downloadingInvoice = ref(false);
 
 const fetchOrder = async () => {
   try {
@@ -176,6 +177,27 @@ const updateTrackingInfo = async () => {
     fetchOrder();
   } catch (err) {
     alert('Failed to update tracking');
+  }
+};
+
+const downloadInvoice = async () => {
+  downloadingInvoice.value = true;
+  try {
+    const response = await api.get(`/admin/orders/${order.value.id}/invoice`, {
+      responseType: 'blob'
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `invoice-${order.value.order_number}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    console.error('Invoice download failed', err);
+    alert('Failed to download invoice. Ensure dompdf is correctly configured.');
+  } finally {
+    downloadingInvoice.value = false;
   }
 };
 

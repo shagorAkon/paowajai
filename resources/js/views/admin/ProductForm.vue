@@ -355,7 +355,12 @@ const saveProduct = async () => {
     // Append all basic fields
     Object.keys(form.value).forEach(key => {
       if (key !== 'variants' && key !== 'images' && key !== 'category' && form.value[key] !== null) {
-        formData.append(key, form.value[key]);
+        let value = form.value[key];
+        // Convert booleans to 1 or 0 for Laravel validation
+        if (typeof value === 'boolean') {
+          value = value ? 1 : 0;
+        }
+        formData.append(key, value);
       }
     });
 

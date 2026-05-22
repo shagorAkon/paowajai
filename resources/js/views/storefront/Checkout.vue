@@ -1,63 +1,63 @@
 <template>
   <div class="max-w-6xl mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold text-slate-900 mb-8">Secure Checkout</h1>
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-8">Secure Checkout</h1>
 
     <div class="flex flex-col lg:flex-row gap-12">
       <!-- Checkout Form -->
       <div class="lg:w-2/3 space-y-8">
         <!-- Contact & Shipping -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h2 class="text-xl font-bold mb-6 pb-2 border-b">1. Delivery Information</h2>
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 class="text-xl font-bold mb-6 pb-2 border-b dark:border-slate-700">1. Delivery Information</h2>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-semibold mb-2">Full Name <span class="text-red-500">*</span></label>
-              <input v-model="form.customer_name" type="text" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-primary-500 outline-none">
+              <input v-model="form.customer_name" type="text" class="w-full px-4 py-3 rounded-xl border dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold mb-2">Phone Number <span class="text-red-500">*</span></label>
-                <input v-model="form.customer_phone" type="text" placeholder="01XXXXXXXXX" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-primary-500 outline-none">
+                <input v-model="form.customer_phone" type="text" placeholder="01XXXXXXXXX" class="w-full px-4 py-3 rounded-xl border dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
               </div>
               <div>
                 <label class="block text-sm font-semibold mb-2">Email Address (Optional)</label>
-                <input v-model="form.customer_email" type="email" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-primary-500 outline-none">
+                <input v-model="form.customer_email" type="email" class="w-full px-4 py-3 rounded-xl border dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
               </div>
             </div>
             <div>
               <label class="block text-sm font-semibold mb-2">Detailed Address <span class="text-red-500">*</span></label>
-              <textarea v-model="form.shipping_address" rows="3" placeholder="House No, Road No, Area" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-primary-500 outline-none"></textarea>
+              <textarea v-model="form.shipping_address" rows="3" placeholder="House No, Road No, Area" class="w-full px-4 py-3 rounded-xl border dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none"></textarea>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold mb-2">City/District <span class="text-red-500">*</span></label>
-                <select v-model="form.shipping_city" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-primary-500 outline-none bg-white">
+                <select v-model="form.shipping_city" class="w-full px-4 py-3 rounded-xl border dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none bg-white dark:bg-slate-900">
                   <option value="Dhaka">Inside Dhaka</option>
                   <option value="Outside">Outside Dhaka</option>
                 </select>
               </div>
               <div>
                 <label class="block text-sm font-semibold mb-2">Postal/ZIP Code</label>
-                <input v-model="form.shipping_zip" type="text" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-primary-500 outline-none">
+                <input v-model="form.shipping_zip" type="text" class="w-full px-4 py-3 rounded-xl border dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none">
               </div>
             </div>
           </div>
         </div>
 
         <!-- Payment Method -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h2 class="text-xl font-bold mb-6 pb-2 border-b">2. Payment Method</h2>
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 class="text-xl font-bold mb-6 pb-2 border-b dark:border-slate-700">2. Payment Method</h2>
           <div class="space-y-4">
-            <label class="flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors" :class="{'border-primary-500 bg-primary-50': form.payment_method === 'cod'}">
+            <label class="flex items-center justify-between p-4 border dark:border-slate-600 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" :class="{'border-primary-500 bg-primary-50 dark:bg-primary-900/30': form.payment_method === 'cod'}">
               <div class="flex items-center gap-3">
                 <input type="radio" v-model="form.payment_method" value="cod" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
-                <span class="font-bold text-slate-900">Cash on Delivery (COD)</span>
+                <span class="font-bold text-slate-900 dark:text-white">Cash on Delivery (COD)</span>
               </div>
               <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             </label>
-            <label class="flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors" :class="{'border-primary-500 bg-primary-50': form.payment_method === 'bkash'}">
+            <label class="flex items-center justify-between p-4 border dark:border-slate-600 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" :class="{'border-primary-500 bg-primary-50 dark:bg-primary-900/30': form.payment_method === 'bkash'}">
               <div class="flex items-center gap-3">
                 <input type="radio" v-model="form.payment_method" value="bkash" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
-                <span class="font-bold text-slate-900">bKash (Coming Soon)</span>
+                <span class="font-bold text-slate-900 dark:text-white">bKash (Coming Soon)</span>
               </div>
             </label>
           </div>
@@ -66,14 +66,14 @@
 
       <!-- Order Summary Sidebar -->
       <div class="lg:w-1/3">
-        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 sticky top-24">
-          <h2 class="text-xl font-bold mb-6 pb-2 border-b">Order Summary</h2>
+        <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 sticky top-24">
+          <h2 class="text-xl font-bold mb-6 pb-2 border-b dark:border-slate-700">Order Summary</h2>
           
           <div class="space-y-4 max-h-[400px] overflow-y-auto mb-6 pr-2">
             <div v-for="item in cartItems" :key="item.id" class="flex gap-4 items-start">
-              <img :src="item.thumbnail" class="w-16 h-16 object-cover rounded-lg border bg-white">
+              <img :src="item.thumbnail" class="w-16 h-16 object-cover rounded-lg border dark:border-slate-600 bg-white">
               <div class="flex-1">
-                <h4 class="font-bold text-sm text-slate-900 leading-tight line-clamp-2">{{ item.name }}</h4>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white leading-tight line-clamp-2">{{ item.name }}</h4>
                 <p class="text-xs text-slate-500 mt-1" v-if="item.variant">Variant: {{ item.variant }}</p>
                 <div class="flex justify-between items-center mt-2">
                   <span class="text-sm font-semibold">৳ {{ item.price }} x {{ item.quantity }}</span>
@@ -83,18 +83,18 @@
             </div>
           </div>
 
-          <div class="space-y-3 pt-4 border-t border-slate-200 text-sm">
+          <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700 text-sm">
             <div class="flex justify-between text-slate-600">
               <span>Subtotal</span>
-              <span class="font-semibold text-slate-900">৳ {{ subtotal }}</span>
+              <span class="font-semibold text-slate-900 dark:text-white">৳ {{ subtotal }}</span>
             </div>
             <div class="flex justify-between text-slate-600">
               <span>Shipping ({{ form.shipping_city }})</span>
-              <span class="font-semibold text-slate-900">৳ {{ shippingCost }}</span>
+              <span class="font-semibold text-slate-900 dark:text-white">৳ {{ shippingCost }}</span>
             </div>
           </div>
 
-          <div class="flex justify-between items-center pt-4 mt-4 border-t border-slate-200">
+          <div class="flex justify-between items-center pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
             <span class="font-bold text-lg">Total Amount</span>
             <span class="font-black text-2xl text-primary-600">৳ {{ total }}</span>
           </div>
@@ -110,11 +110,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../../utils/api';
+import { useAuthStore } from '../../stores/useAuthStore';
 
 const router = useRouter();
+const authStore = useAuthStore();
 const loading = ref(false);
 
 const form = ref({
@@ -131,6 +133,27 @@ const form = ref({
 const cartItems = ref([]);
 
 onMounted(() => {
+  if (authStore.user) {
+    form.value.customer_name = authStore.user.name || '';
+    form.value.customer_email = authStore.user.email || '';
+    form.value.customer_phone = authStore.user.phone || '';
+    form.value.shipping_address = authStore.user.address || '';
+    if (authStore.user.city) form.value.shipping_city = authStore.user.city;
+    if (authStore.user.zip) form.value.shipping_zip = authStore.user.zip;
+  }
+
+  // Watch for auth changes in case user data is loaded after mount
+  watch(() => authStore.user, (user) => {
+    if (user) {
+      if (!form.value.customer_name) form.value.customer_name = user.name || '';
+      if (!form.value.customer_email) form.value.customer_email = user.email || '';
+      if (!form.value.customer_phone) form.value.customer_phone = user.phone || '';
+      if (!form.value.shipping_address) form.value.shipping_address = user.address || '';
+      if (!form.value.shipping_zip) form.value.shipping_zip = user.zip || '';
+    }
+  });
+
+
   // Load mock data for testing if empty
   const cart = JSON.parse(localStorage.getItem('cart') || '[]');
   if(cart.length === 0) {

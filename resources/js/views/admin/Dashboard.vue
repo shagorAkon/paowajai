@@ -44,14 +44,17 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-            <tr v-for="i in 5" :key="i" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-              <td class="px-6 py-4 font-medium">#ORD-{{ 1000 + i }}</td>
-              <td class="px-6 py-4">Customer {{ i }}</td>
-              <td class="px-6 py-4 text-slate-500">Today, 10:{{ i }}0 AM</td>
+            <tr v-if="recentOrders.length === 0">
+              <td colspan="5" class="px-6 py-4 text-center text-slate-500">No recent orders</td>
+            </tr>
+            <tr v-for="order in recentOrders" :key="order.id" class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+              <td class="px-6 py-4 font-medium">#{{ order.order_number }}</td>
+              <td class="px-6 py-4">{{ order.customer_name }}</td>
+              <td class="px-6 py-4 text-slate-500">{{ new Date(order.created_at).toLocaleDateString() }}</td>
               <td class="px-6 py-4">
-                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400">Processing</span>
+                <span class="px-2.5 py-1 rounded-full text-xs font-medium capitalize" :class="statusColor(order.status)">{{ order.status }}</span>
               </td>
-              <td class="px-6 py-4 text-right font-bold">৳ {{ (1200 * i).toLocaleString('en-IN') }}</td>
+              <td class="px-6 py-4 text-right font-bold">৳ {{ Number(order.total).toLocaleString('en-IN') }}</td>
             </tr>
           </tbody>
         </table>
@@ -61,17 +64,63 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
+import api from '../../utils/api';
 import { 
   CurrencyDollarIcon, 
   ShoppingBagIcon, 
   UsersIcon, 
-  ChartBarIcon 
+  ChartBarIcon,
+  ClockIcon,
+  TruckIcon,
+  CheckBadgeIcon
 } from '@heroicons/vue/24/outline';
 
-const stats = [
-  { name: 'Total Revenue', value: '৳ 124,500', change: 12.5, icon: CurrencyDollarIcon, bgColor: 'bg-primary-100 dark:bg-primary-500/20', textColor: 'text-primary-600 dark:text-primary-400' },
-  { name: 'Total Orders', value: '256', change: 8.2, icon: ShoppingBagIcon, bgColor: 'bg-blue-100 dark:bg-blue-500/20', textColor: 'text-blue-600 dark:text-blue-400' },
-  { name: 'Total Customers', value: '1,420', change: -2.4, icon: UsersIcon, bgColor: 'bg-purple-100 dark:bg-purple-500/20', textColor: 'text-purple-600 dark:text-purple-400' },
-  { name: 'Conversion Rate', value: '3.6%', change: 1.1, icon: ChartBarIcon, bgColor: 'bg-green-100 dark:bg-green-500/20', textColor: 'text-green-600 dark:text-green-400' },
-];
+const rawStats = ref(null);
+const recentOrders = ref([]);
+const stats = ref([]);
+let pollInterval = null;
+
+const fetchDashboardData = async () => {
+  try {
+    const [statsRes, ordersRes] = await Promise.all([
+      api.get('/admin/dashboard/stats'),
+      api.get('/admin/dashboard/recent-orders')
+    ]);
+
+    const data = statsRes.data;
+    recentOrders.value = ordersRes.data;
+
+    stats.value = [
+      { name: 'Total Revenue', value: `৳ ${Number(data.total_revenue).toLocaleString()}`, change: 0, icon: CurrencyDollarIcon, bgColor: 'bg-primary-100 dark:bg-primary-500/20', textColor: 'text-primary-600 dark:text-primary-400' },
+      { name: 'Total Orders', value: data.total_orders, change: 0, icon: ShoppingBagIcon, bgColor: 'bg-blue-100 dark:bg-blue-500/20', textColor: 'text-blue-600 dark:text-blue-400' },
+      { name: 'Pending Orders', value: data.pending_orders, change: 0, icon: ClockIcon, bgColor: 'bg-yellow-100 dark:bg-yellow-500/20', textColor: 'text-yellow-600 dark:text-yellow-400' },
+      { name: 'Processing', value: data.processing_orders, change: 0, icon: TruckIcon, bgColor: 'bg-indigo-100 dark:bg-indigo-500/20', textColor: 'text-indigo-600 dark:text-indigo-400' },
+      { name: 'Delivered', value: data.delivered_orders, change: 0, icon: CheckBadgeIcon, bgColor: 'bg-green-100 dark:bg-green-500/20', textColor: 'text-green-600 dark:text-green-400' },
+      { name: 'Total Customers', value: data.total_customers, change: 0, icon: UsersIcon, bgColor: 'bg-purple-100 dark:bg-purple-500/20', textColor: 'text-purple-600 dark:text-purple-400' },
+    ];
+  } catch (error) {
+    console.error('Failed to load dashboard data', error);
+  }
+};
+
+const statusColor = (status) => {
+  const colors = {
+    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+    processing: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
+    shipped: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    delivered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+  };
+  return colors[status] || 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
+};
+
+onMounted(() => {
+  fetchDashboardData();
+  pollInterval = setInterval(fetchDashboardData, 30000);
+});
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval);
+});
 </script>

@@ -28,7 +28,9 @@
 
     --animate-fade-in: fade-in 0.5s ease-out;
     --animate-slide-up: slide-up 0.5s ease-out;
+    --animate-slide-left: slide-left 0.5s ease-out;
     --animate-float: float 3s ease-in-out infinite;
+    --animate-count-up: count-up 2s ease-out;
 
     @keyframes fade-in {
         from { opacity: 0; }
@@ -42,6 +44,14 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-10px); }
     }
+    @keyframes slide-left {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes count-up {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 }
 
 @layer utilities {
@@ -53,6 +63,12 @@
     }
     .text-gradient {
         @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-blue-600 dark:from-primary-400 dark:to-blue-400;
+    }
+    .premium-shadow {
+        @apply shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)];
+    }
+    .hover-lift {
+        @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
     }
 }
 

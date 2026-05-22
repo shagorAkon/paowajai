@@ -79,6 +79,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+                'tracking_number' => 'TRK-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
                 'user_id' => auth('sanctum')->id(), // Null for guests
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
@@ -96,7 +97,17 @@ class CheckoutController extends Controller
 
             $order->items()->createMany($orderItemsData);
 
+            // Add Initial History
+            $order->histories()->create([
+                'status' => 'pending',
+                'note' => 'Order has been placed successfully.'
+            ]);
+
             DB::commit();
+
+            // Notify Admins
+            $admins = \App\Models\User::role(['Admin', 'Super Admin'])->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
 
             // Fire Mailables here if configured
             // Mail::to($order->customer_email)->send(new OrderPlaced($order));
@@ -104,6 +115,7 @@ class CheckoutController extends Controller
             return response()->json([
                 'message' => 'Order placed successfully',
                 'order_number' => $order->order_number,
+                'tracking_number' => $order->tracking_number,
                 'total' => $order->total
             ], 201);
 

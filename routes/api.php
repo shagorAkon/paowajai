@@ -48,8 +48,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/products/featured', [StorefrontProductController::class, 'featured']);
         Route::get('/products/flash-sale', [StorefrontProductController::class, 'flashSale']);
         Route::get('/products/{slug}', [StorefrontProductController::class, 'show']);
-        Route::post('/checkout', [CheckoutController::class, 'store']);
-        Route::get('/track-order/{order_number}', [CheckoutController::class, 'track']);
+        // Orders & Tracking
+        Route::post('/checkout', [\App\Http\Controllers\Api\V1\Storefront\CheckoutController::class, 'store']);
+        Route::get('/track-order/{order_number}', [\App\Http\Controllers\Api\V1\Storefront\CheckoutController::class, 'track']);
+        Route::get('/tracking/search', [\App\Http\Controllers\Api\V1\Storefront\TrackingController::class, 'search']);
+        Route::get('/tracking/{order_number}/invoice', [\App\Http\Controllers\Api\V1\Storefront\TrackingController::class, 'downloadInvoice']);
         Route::get('/payment/callback', [\App\Http\Controllers\Api\V1\Storefront\PaymentCallbackController::class, 'handleCallback']);
     });
 
@@ -64,6 +67,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard/top-products', [DashboardController::class, 'topProducts']);
         Route::get('/dashboard/recent-orders', [DashboardController::class, 'recentOrders']);
         Route::get('/dashboard/order-status-breakdown', [DashboardController::class, 'orderStatusBreakdown']);
+        Route::get('/dashboard/notifications', [DashboardController::class, 'notifications']);
+        Route::post('/dashboard/notifications/{id}/read', [DashboardController::class, 'markNotificationAsRead']);
+        Route::get('/dashboard/reports/export', [\App\Http\Controllers\Api\V1\Admin\ReportController::class, 'export']);
 
         // Categories
         Route::apiResource('/categories', AdminCategoryController::class);

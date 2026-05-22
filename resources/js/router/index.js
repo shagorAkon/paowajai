@@ -8,6 +8,8 @@ import ProductDetail from '../views/ProductDetail.vue';
 import Checkout from '../views/storefront/Checkout.vue';
 import TrackOrder from '../views/storefront/TrackOrder.vue';
 import Login from '../views/auth/Login.vue';
+import About from '../views/About.vue';
+import Featured from '../views/Featured.vue';
 
 // Admin Views
 import AdminDashboard from '../views/admin/Dashboard.vue';
@@ -33,6 +35,16 @@ const routes = [
         name: 'login',
         component: Login,
         meta: { guestOnly: true }
+    },
+    {
+        path: '/about',
+        name: 'about',
+        component: About,
+    },
+    {
+        path: '/featured',
+        name: 'featured',
+        component: Featured,
     },
     {
         path: '/products',
@@ -137,6 +149,12 @@ const routes = [
         path: '/admin/marketing',
         name: 'admin.marketing',
         component: AdminMarketing,
+        meta: { layout: 'admin', requiresAuth: true, isAdmin: true }
+    },
+    {
+        path: '/admin/reports',
+        name: 'admin.reports',
+        component: () => import('../views/admin/Reports.vue'),
         meta: { layout: 'admin', requiresAuth: true, isAdmin: true }
     },
     // Add catch-all redirect for now on missing admin routes

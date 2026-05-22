@@ -8,11 +8,13 @@
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from './stores/useAuthStore';
+import { useThemeStore } from './stores/useThemeStore';
 import StorefrontLayout from './layouts/StorefrontLayout.vue';
 import AdminLayout from './layouts/AdminLayout.vue';
 
 const route = useRoute();
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 
 // Dynamically resolve the layout based on route meta
 const layoutComponent = computed(() => {
@@ -24,5 +26,6 @@ const layoutComponent = computed(() => {
 
 onMounted(() => {
   authStore.fetchUser();
+  themeStore.initTheme();
 });
 </script>
