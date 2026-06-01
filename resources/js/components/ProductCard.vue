@@ -4,7 +4,7 @@
     <div class="relative aspect-square overflow-hidden bg-slate-50 dark:bg-slate-900">
       <router-link :to="`/product/${product.slug}`">
         <img 
-          :src="product.thumbnail ? `/storage/${product.thumbnail}` : 'https://placehold.co/600x600/f8fafc/94a3b8?text=Product'" 
+          :src="product.thumbnail ? (product.thumbnail.startsWith('http') ? product.thumbnail : `/storage/${product.thumbnail}`) : 'https://placehold.co/600x600/f8fafc/94a3b8?text=Product'" 
           :alt="product.name"
           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         >

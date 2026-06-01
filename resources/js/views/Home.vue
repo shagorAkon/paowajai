@@ -2,16 +2,16 @@
   <div class="space-y-24 pb-24">
     
     <!-- Premium Hero Carousel -->
-    <section v-if="productStore.homeData?.banners?.length" class="relative h-[70vh] min-h-[500px] bg-slate-950 overflow-hidden group">
+    <section v-if="displayBanners.length" class="relative h-[70vh] min-h-[500px] bg-slate-950 overflow-hidden group">
       <div 
-        v-for="(banner, index) in productStore.homeData.banners" 
+        v-for="(banner, index) in displayBanners" 
         :key="banner.id"
         class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
         :class="index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'"
       >
         <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 to-slate-900/40 z-10"></div>
         <img 
-          :src="banner.image ? `/storage/${banner.image}` : 'https://images.pexels.com/photos/135620/pexels-photo-135620.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'" 
+          :src="banner.image ? `/storage/${banner.image}` : (banner.fallbackImage || 'https://images.pexels.com/photos/135620/pexels-photo-135620.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')" 
           :alt="banner.title"
           class="absolute inset-0 w-full h-full object-cover transition-transform duration-[10000ms] ease-out"
           :class="index === currentSlide ? 'scale-105' : 'scale-100'"
@@ -48,7 +48,7 @@
       <!-- Carousel Indicators -->
       <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3">
         <button 
-          v-for="(_, index) in productStore.homeData.banners" 
+          v-for="(_, index) in displayBanners" 
           :key="index"
           @click="setSlide(index)"
           class="h-2 rounded-full transition-all duration-300"
@@ -209,7 +209,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useProductStore } from '../stores/useProductStore';
 import ProductCard from '../components/ProductCard.vue';
 
@@ -217,15 +217,51 @@ const productStore = useProductStore();
 const currentSlide = ref(0);
 let slideInterval = null;
 
+const defaultBanners = [
+  {
+    id: 'default-1',
+    title: 'Premium E-Commerce Experience',
+    subtitle: 'Exclusive Offer',
+    image: null,
+    fallbackImage: 'https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    link: '/products',
+    button_text: 'Shop Collection'
+  },
+  {
+    id: 'default-2',
+    title: 'Discover Next-Gen Tech',
+    subtitle: 'New Arrivals',
+    image: null,
+    fallbackImage: 'https://images.pexels.com/photos/39284/macbook-apple-imac-computer-39284.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    link: '/products',
+    button_text: 'Explore Now'
+  },
+  {
+    id: 'default-3',
+    title: 'Elevate Your Wardrobe',
+    subtitle: 'Trending Fashion',
+    image: null,
+    fallbackImage: 'https://images.pexels.com/photos/974911/pexels-photo-974911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    link: '/products',
+    button_text: 'View Fashion'
+  }
+];
+
+const displayBanners = computed(() => {
+  return productStore.homeData?.banners?.length 
+    ? productStore.homeData.banners 
+    : defaultBanners;
+});
+
 const nextSlide = () => {
-  if (!productStore.homeData?.banners?.length) return;
-  currentSlide.value = (currentSlide.value + 1) % productStore.homeData.banners.length;
+  if (!displayBanners.value.length) return;
+  currentSlide.value = (currentSlide.value + 1) % displayBanners.value.length;
 };
 
 const prevSlide = () => {
-  if (!productStore.homeData?.banners?.length) return;
+  if (!displayBanners.value.length) return;
   currentSlide.value = currentSlide.value === 0 
-    ? productStore.homeData.banners.length - 1 
+    ? displayBanners.value.length - 1 
     : currentSlide.value - 1;
 };
 
@@ -234,12 +270,13 @@ const setSlide = (index) => {
 };
 
 const startCarousel = () => {
+  if (slideInterval) clearInterval(slideInterval);
   slideInterval = setInterval(nextSlide, 5000);
 };
 
 onMounted(async () => {
   await productStore.fetchHomeData();
-  if (productStore.homeData?.banners?.length > 1) {
+  if (displayBanners.value.length > 1) {
     startCarousel();
   }
 });
