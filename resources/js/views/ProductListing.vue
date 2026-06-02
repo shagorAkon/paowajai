@@ -114,7 +114,7 @@ const route = useRoute();
 const productStore = useProductStore();
 
 const filters = reactive({
-  search: '',
+  search: route.query.search || '',
   min_price: '',
   max_price: '',
   category: route.params.slug || '',
@@ -147,6 +147,12 @@ const applyFilters = () => {
 
 watch(() => route.params.slug, (newSlug) => {
   filters.category = newSlug || '';
+  loadProducts();
+});
+
+// Watch for search query param changes (from navbar search "View all results" link)
+watch(() => route.query.search, (newSearch) => {
+  filters.search = newSearch || '';
   loadProducts();
 });
 

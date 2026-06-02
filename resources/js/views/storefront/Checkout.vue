@@ -69,24 +69,29 @@
         <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 sticky top-24">
           <h2 class="text-xl font-bold mb-6 pb-2 border-b dark:border-slate-700">Order Summary</h2>
           
-          <div class="space-y-4 max-h-[400px] overflow-y-auto mb-6 pr-2">
-            <div v-for="item in cartItems" :key="item.id" class="flex gap-4 items-start">
-              <img :src="item.thumbnail" class="w-16 h-16 object-cover rounded-lg border dark:border-slate-600 bg-white">
+          <div v-if="cartStore.items.length === 0" class="py-8 text-center text-slate-500">
+            <p class="font-medium">Your cart is empty.</p>
+            <router-link to="/products" class="text-primary-500 font-semibold hover:underline mt-2 inline-block">Continue Shopping</router-link>
+          </div>
+
+          <div v-else class="space-y-4 max-h-[400px] overflow-y-auto mb-6 pr-2">
+            <div v-for="item in cartStore.items" :key="`${item.product_id}-${item.variant_id}`" class="flex gap-4 items-start">
+              <img :src="item.image ? (item.image.startsWith('http') ? item.image : `/storage/${item.image}`) : 'https://placehold.co/100x100/f8fafc/94a3b8?text=P'" class="w-16 h-16 object-cover rounded-lg border dark:border-slate-600 bg-white">
               <div class="flex-1">
                 <h4 class="font-bold text-sm text-slate-900 dark:text-white leading-tight line-clamp-2">{{ item.name }}</h4>
-                <p class="text-xs text-slate-500 mt-1" v-if="item.variant">Variant: {{ item.variant }}</p>
+                <p class="text-xs text-slate-500 mt-1" v-if="item.variant_label">Variant: {{ item.variant_label }}</p>
                 <div class="flex justify-between items-center mt-2">
-                  <span class="text-sm font-semibold">৳ {{ item.price }} x {{ item.quantity }}</span>
-                  <span class="text-sm font-bold text-primary-600">৳ {{ item.price * item.quantity }}</span>
+                  <span class="text-sm font-semibold">৳ {{ Number(item.price).toLocaleString('en-IN') }} x {{ item.quantity }}</span>
+                  <span class="text-sm font-bold text-primary-600">৳ {{ (item.price * item.quantity).toLocaleString('en-IN') }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700 text-sm">
+          <div v-if="cartStore.items.length > 0" class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700 text-sm">
             <div class="flex justify-between text-slate-600">
               <span>Subtotal</span>
-              <span class="font-semibold text-slate-900 dark:text-white">৳ {{ subtotal }}</span>
+              <span class="font-semibold text-slate-900 dark:text-white">৳ {{ cartStore.subtotal.toLocaleString('en-IN') }}</span>
             </div>
             <div class="flex justify-between text-slate-600">
               <span>Shipping ({{ form.shipping_city }})</span>
@@ -94,12 +99,12 @@
             </div>
           </div>
 
-          <div class="flex justify-between items-center pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
+          <div v-if="cartStore.items.length > 0" class="flex justify-between items-center pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
             <span class="font-bold text-lg">Total Amount</span>
-            <span class="font-black text-2xl text-primary-600">৳ {{ total }}</span>
+            <span class="font-black text-2xl text-primary-600">৳ {{ total.toLocaleString('en-IN') }}</span>
           </div>
 
-          <button @click="placeOrder" :disabled="loading || cartItems.length === 0" class="w-full mt-8 bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 rounded-xl transition-colors shadow-xl shadow-primary-600/30 flex justify-center items-center gap-2">
+          <button @click="placeOrder" :disabled="loading || cartStore.items.length === 0" class="w-full mt-8 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors shadow-xl shadow-primary-600/30 flex justify-center items-center gap-2">
             <svg v-if="loading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             {{ loading ? 'Processing...' : 'Confirm Order' }}
           </button>
@@ -114,9 +119,11 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../../utils/api';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useCartStore } from '../../stores/useCartStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const cartStore = useCartStore();
 const loading = ref(false);
 
 const form = ref({
@@ -128,9 +135,6 @@ const form = ref({
   shipping_zip: '',
   payment_method: 'cod'
 });
-
-// Mock Cart Items - in reality, load from Pinia store/localStorage
-const cartItems = ref([]);
 
 onMounted(() => {
   if (authStore.user) {
@@ -152,29 +156,13 @@ onMounted(() => {
       if (!form.value.shipping_zip) form.value.shipping_zip = user.zip || '';
     }
   });
-
-
-  // Load mock data for testing if empty
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  if(cart.length === 0) {
-    // Add mock item to test checkout
-    cartItems.value = [
-      { id: 1, product_id: 1, name: 'Premium Wireless Headphones', thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200', price: 4500, quantity: 1 }
-    ];
-  } else {
-    cartItems.value = cart;
-  }
-});
-
-const subtotal = computed(() => {
-  return cartItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 });
 
 const shippingCost = computed(() => {
   return form.value.shipping_city === 'Dhaka' ? 60 : 120;
 });
 
-const total = computed(() => subtotal.value + shippingCost.value);
+const total = computed(() => cartStore.subtotal + shippingCost.value);
 
 const placeOrder = async () => {
   if (!form.value.customer_name || !form.value.customer_phone || !form.value.shipping_address) {
@@ -186,7 +174,7 @@ const placeOrder = async () => {
   try {
     const payload = {
       ...form.value,
-      items: cartItems.value.map(i => ({
+      items: cartStore.items.map(i => ({
         product_id: i.product_id,
         variant_id: i.variant_id || null,
         quantity: i.quantity
@@ -195,8 +183,8 @@ const placeOrder = async () => {
 
     const { data } = await api.post('/storefront/checkout', payload);
     
-    // Clear Cart
-    localStorage.removeItem('cart');
+    // Clear the cart properly via the store
+    cartStore.clearCart();
     
     // Redirect to tracking page
     router.push({ name: 'storefront.track', params: { order_number: data.order_number } });
@@ -207,3 +195,4 @@ const placeOrder = async () => {
   }
 };
 </script>
+

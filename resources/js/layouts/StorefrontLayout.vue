@@ -35,7 +35,7 @@
             
             <ul v-else class="space-y-6">
               <li v-for="item in cartStore.items" :key="`${item.product_id}-${item.variant_id}`" class="flex gap-4">
-                <img :src="item.image ? `/storage/${item.image}` : 'https://placehold.co/100x100'" class="w-20 h-20 rounded-lg object-cover bg-slate-100">
+                <img :src="item.image ? (item.image.startsWith('http') ? item.image : `/storage/${item.image}`) : 'https://placehold.co/100x100/f8fafc/94a3b8?text=P'" class="w-20 h-20 rounded-lg object-cover bg-slate-100">
                 <div class="flex-1 flex flex-col">
                   <div class="flex justify-between">
                     <h3 class="font-semibold line-clamp-1 pr-4">{{ item.name }}</h3>
