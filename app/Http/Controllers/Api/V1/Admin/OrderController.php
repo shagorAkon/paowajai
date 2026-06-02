@@ -63,6 +63,46 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
+    public function updateItemStatus(Request $request, Order $order, $itemId)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,accepted,shipped,rejected',
+        ]);
+
+        $item = $order->items()->findOrFail($itemId);
+        $oldStatus = $item->status;
+        $newStatus = $validated['status'];
+
+        if ($oldStatus !== $newStatus) {
+            // Handle stock and price changes when moving TO rejected
+            if ($newStatus === 'rejected') {
+                $order->subtotal -= $item->total;
+                $order->total -= $item->total;
+                $order->save();
+
+                if ($item->product_variant_id) {
+                    \App\Models\ProductVariant::where('id', $item->product_variant_id)->increment('stock_quantity', $item->quantity);
+                }
+                \App\Models\Product::where('id', $item->product_id)->increment('stock_quantity', $item->quantity);
+            } 
+            // Handle stock and price changes when moving FROM rejected
+            else if ($oldStatus === 'rejected') {
+                $order->subtotal += $item->total;
+                $order->total += $item->total;
+                $order->save();
+
+                if ($item->product_variant_id) {
+                    \App\Models\ProductVariant::where('id', $item->product_variant_id)->decrement('stock_quantity', $item->quantity);
+                }
+                \App\Models\Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
+            }
+
+            $item->update(['status' => $newStatus]);
+        }
+
+        return response()->json($order->load(['items.product', 'items.variant', 'user', 'payments']));
+    }
+
     public function updateTracking(Request $request, Order $order)
     {
         $validated = $request->validate([

@@ -15,7 +15,7 @@ class DemoDataSeeder extends Seeder
     {
         // Create Admin User
         $admin = User::firstOrCreate(
-            ['email' => 'admin@paowajai.com'],
+            ['email' => 'admin@paowazay.com'],
             [
                 'name' => 'Super Admin',
                 'password' => Hash::make('password'),

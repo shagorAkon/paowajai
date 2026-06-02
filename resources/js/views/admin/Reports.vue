@@ -17,7 +17,7 @@
           </select>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium mb-2">Start Date</label>
             <input type="date" v-model="form.start_date" class="w-full px-4 py-2 rounded-xl border dark:border-slate-600 dark:bg-slate-900 outline-none focus:ring-2 focus:ring-primary-500">

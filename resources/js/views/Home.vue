@@ -118,8 +118,9 @@
           :to="`/category/${cat.slug}`"
           class="group glass-card premium-shadow p-6 flex flex-col items-center justify-center text-center gap-4 hover-lift cursor-pointer border-t-4 border-t-transparent hover:border-t-primary-500"
         >
-          <div class="text-4xl w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
-            {{ cat.icon || '📦' }}
+          <div class="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300 overflow-hidden">
+            <img v-if="cat.image" :src="`/storage/${cat.image}`" :alt="cat.name" class="w-full h-full object-cover">
+            <span v-else class="text-4xl">{{ cat.icon || '📦' }}</span>
           </div>
           <span class="font-bold text-sm text-slate-800 dark:text-slate-200">{{ cat.name }}</span>
         </router-link>

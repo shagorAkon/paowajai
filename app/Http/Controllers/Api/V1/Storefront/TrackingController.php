@@ -80,10 +80,10 @@ class TrackingController extends Controller
         $data = [
             'order' => $order,
             'qrCode' => 'data:image/svg+xml;base64,' . $qrCode,
-            'company_name' => 'Paowajai Ecommerce',
+            'company_name' => 'Paowazay Ecommerce',
             'company_address' => 'Dhaka, Bangladesh',
             'company_phone' => '+880 123 456 7890',
-            'company_email' => 'support@paowajai.com'
+            'company_email' => 'support@paowazay.com'
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.order', $data);

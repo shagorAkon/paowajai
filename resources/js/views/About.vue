@@ -124,7 +124,7 @@
           <h2 class="text-4xl font-black">Meet Our Founder</h2>
           <h3 class="text-xl text-primary-500 font-bold">Nisharul Islam Nirob</h3>
           <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-            With a deep passion for quality and customer satisfaction, Nisharul Islam Nirob founded Paowajai with a simple yet powerful vision: to make premium imported products accessible to everyone without compromising on authenticity or service.
+            With a deep passion for quality and customer satisfaction, Nisharul Islam Nirob founded Paowazay with a simple yet powerful vision: to make premium imported products accessible to everyone without compromising on authenticity or service.
           </p>
           <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
             "সম্পর্ক হউক হালাল, উদ্দেশ্য হউক জান্নাত — Our focus has always been integrity and trust. Every product we source and every feature we build is designed to make your shopping journey unforgettable."

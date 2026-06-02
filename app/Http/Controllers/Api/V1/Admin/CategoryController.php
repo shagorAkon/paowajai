@@ -25,7 +25,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|exists:categories,id',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:10240',
             'icon' => 'nullable|string|max:100',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
@@ -42,6 +42,8 @@ class CategoryController extends Controller
 
         $category = Category::create($validated);
 
+        \Illuminate\Support\Facades\Cache::forget('storefront_home_data');
+
         return response()->json($category, 201);
     }
 
@@ -57,7 +59,7 @@ class CategoryController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'parent_id' => 'nullable|exists:categories,id',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:10240',
             'icon' => 'nullable|string|max:100',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
@@ -76,12 +78,17 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
+        \Illuminate\Support\Facades\Cache::forget('storefront_home_data');
+
         return response()->json($category);
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
+
+        \Illuminate\Support\Facades\Cache::forget('storefront_home_data');
+
         return response()->json(['message' => 'Category deleted successfully']);
     }
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryControl
 use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController;
+use App\Http\Controllers\Api\V1\Admin\BannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +82,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
         Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
+        Route::patch('/orders/{order}/items/{item}/status', [AdminOrderController::class, 'updateItemStatus']);
         Route::patch('/orders/{order}/tracking', [AdminOrderController::class, 'updateTracking']);
         Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy']);
         Route::get('/orders/{order}/invoice', [\App\Http\Controllers\Api\V1\Admin\InvoiceController::class, 'download']);
@@ -88,5 +90,11 @@ Route::prefix('v1')->group(function () {
         // Settings
         Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index']);
         Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update']);
+
+        // Banners (Customize Home Page)
+        Route::get('/banners', [BannerController::class, 'index']);
+        Route::post('/banners', [BannerController::class, 'store']);
+        Route::post('/banners/{id}', [BannerController::class, 'update']); // Using POST for file upload updates
+        Route::delete('/banners/{id}', [BannerController::class, 'destroy']);
     });
 });

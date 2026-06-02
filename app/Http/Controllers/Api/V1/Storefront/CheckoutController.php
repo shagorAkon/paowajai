@@ -51,6 +51,7 @@ class CheckoutController extends Controller
                         throw new \Exception("Insufficient stock for {$product->name} - {$variantLabel}");
                     }
                     $variant->decrement('stock_quantity', $item['quantity']);
+                    $product->decrement('stock_quantity', $item['quantity']);
                 } else {
                     // Reduce product base stock
                     if ($product->stock_quantity < $item['quantity']) {

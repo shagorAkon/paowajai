@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Invoice - {{ $order->order_number }}</title>
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.5; font-size: 14px; }
+        body { font-family: 'DejaVu Sans', sans-serif; color: #333; line-height: 1.5; font-size: 14px; }
         .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
         .header { display: flex; justify-content: space-between; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 20px; }
         .header h1 { margin: 0; color: #111; font-size: 32px; }
@@ -66,14 +66,15 @@
                 @foreach($order->items as $item)
                 <tr>
                     <td>
-                        <strong>{{ $item->product_name }}</strong>
+                        <strong {!! $item->status === 'rejected' ? 'style="text-decoration: line-through; color: #999;"' : '' !!}>{{ $item->product_name }}</strong>
+                        <span style="font-size: 9px; padding: 2px 4px; border-radius: 2px; margin-left: 5px; text-transform: uppercase; font-weight: bold; {{ $item->status === 'rejected' ? 'background: #ffebee; color: #c62828;' : ($item->status === 'accepted' || $item->status === 'shipped' ? 'background: #e3f2fd; color: #1565c0;' : 'background: #fff8e1; color: #f57f17;') }}">{{ $item->status ?? 'pending' }}</span>
                         @if($item->variant_label)
                         <br><span style="color: #777; font-size: 12px;">Variant: {{ $item->variant_label }}</span>
                         @endif
                     </td>
-                    <td style="text-align: center;">{{ $item->quantity }}</td>
-                    <td style="text-align: right;">৳ {{ number_format($item->price, 2) }}</td>
-                    <td style="text-align: right;">৳ {{ number_format($item->total, 2) }}</td>
+                    <td style="text-align: center; {{ $item->status === 'rejected' ? 'text-decoration: line-through; color: #999;' : '' }}">{{ $item->quantity }}</td>
+                    <td style="text-align: right; {{ $item->status === 'rejected' ? 'text-decoration: line-through; color: #999;' : '' }}">৳ {{ number_format($item->price, 2) }}</td>
+                    <td style="text-align: right; {{ $item->status === 'rejected' ? 'text-decoration: line-through; color: #999;' : '' }}">৳ {{ number_format($item->total, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>

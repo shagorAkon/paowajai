@@ -37,7 +37,7 @@
               <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Product Name <span class="text-red-500">*</span></label>
               <input v-model="form.name" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none dark:text-white">
             </div>
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">SKU</label>
                 <input v-model="form.sku" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none dark:text-white">
@@ -59,7 +59,7 @@
 
           <!-- PRICING TAB -->
           <div v-show="activeTab === 'pricing'" class="space-y-6 animate-fade-in">
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Regular Price <span class="text-red-500">*</span></label>
                 <div class="relative">
@@ -131,7 +131,7 @@
                 <svg class="mx-auto h-8 w-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 <p class="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">Select multiple images</p>
               </div>
-              <div v-if="galleryPreviews.length > 0" class="mt-4 grid grid-cols-4 gap-4">
+              <div v-if="galleryPreviews.length > 0" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div v-for="(img, idx) in galleryPreviews" :key="idx" class="relative group">
                   <img :src="img.url" class="w-full h-24 object-cover rounded-lg border dark:border-slate-700">
                   <button @click="removeGalleryItem(idx)" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -146,7 +146,7 @@
             
             <div v-for="(variant, index) in form.variants" :key="index" class="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-700 relative">
               <button @click="removeVariant(index)" class="absolute top-4 right-4 text-red-500 hover:text-red-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mr-8">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mr-8">
                 <div>
                   <label class="block text-xs font-semibold text-slate-500 mb-1">Color</label>
                   <input v-model="variant.color" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
@@ -354,7 +354,7 @@ const saveProduct = async () => {
     const formData = new FormData();
     // Append all basic fields
     Object.keys(form.value).forEach(key => {
-      if (key !== 'variants' && key !== 'images' && key !== 'category' && form.value[key] !== null) {
+      if (!['variants', 'images', 'category', 'thumbnail', 'gallery'].includes(key) && form.value[key] !== null) {
         let value = form.value[key];
         // Convert booleans to 1 or 0 for Laravel validation
         if (typeof value === 'boolean') {
@@ -378,18 +378,20 @@ const saveProduct = async () => {
 
     if (isEdit) {
       formData.append('_method', 'PUT');
-      await api.post(`/admin/products/${route.params.id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post(`/admin/products/${route.params.id}`, formData);
     } else {
-      await api.post('/admin/products', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post('/admin/products', formData);
     }
 
     router.push('/admin/products');
   } catch (err) {
-    alert('Failed to save product. Check the console for validation errors.');
+    let errorMessage = 'Failed to save product. Check the console for validation errors.';
+    if (err.response && err.response.data && err.response.data.errors) {
+      const errors = err.response.data.errors;
+      const errorList = Object.keys(errors).map(key => `${key}: ${errors[key].join(', ')}`);
+      errorMessage = 'Validation Errors:\n\n' + errorList.join('\n');
+    }
+    alert(errorMessage);
     console.error(err);
   } finally {
     loading.value = false;

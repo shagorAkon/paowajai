@@ -5,7 +5,7 @@
       <div class="p-8">
         <div class="text-center mb-8">
           <router-link to="/" class="inline-block mb-4">
-            <span class="text-3xl font-black tracking-tighter text-gradient">PAOWAJAI</span>
+            <span class="text-3xl font-black tracking-tighter text-gradient">PAOWAZAY</span>
           </router-link>
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h2>
           <p class="text-slate-500 dark:text-slate-400 mt-2">Sign in to your admin account</p>
@@ -23,7 +23,7 @@
               type="email" 
               required
               class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors outline-none dark:text-white"
-              placeholder="admin@paowajai.com"
+              placeholder="admin@paowazay.com"
             >
           </div>
 

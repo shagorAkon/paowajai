@@ -50,7 +50,7 @@ class ProductController extends Controller
             'stock_quantity' => 'required|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
-            'thumbnail' => 'nullable|image|max:2048',
+            'thumbnail' => 'nullable|image|max:10240',
             'video_url' => 'nullable|url|max:500',
             'is_active' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
@@ -61,7 +61,7 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:500',
-            'gallery.*' => 'nullable|image|max:2048',
+            'gallery.*' => 'nullable|image|max:10240',
             'variants' => 'nullable|array',
             'variants.*.color' => 'nullable|string|max:50',
             'variants.*.size' => 'nullable|string|max:50',
@@ -98,6 +98,8 @@ class ProductController extends Controller
             }
         }
 
+        \Illuminate\Support\Facades\Cache::forget('storefront_home_data');
+
         return response()->json($product->load(['images', 'variants', 'category']), 201);
     }
 
@@ -109,7 +111,8 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $validated = $request->validate([
+        try {
+            $validated = $request->validate([
             'category_id' => 'sometimes|exists:categories,id',
             'name' => 'sometimes|required|string|max:255',
             'sku' => 'nullable|string|max:100|unique:products,sku,' . $product->id,
@@ -122,7 +125,7 @@ class ProductController extends Controller
             'stock_quantity' => 'sometimes|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
-            'thumbnail' => 'nullable|image|max:2048',
+            'thumbnail' => 'nullable|image|max:10240',
             'video_url' => 'nullable|url|max:500',
             'is_active' => 'nullable|boolean',
             'is_featured' => 'nullable|boolean',
@@ -142,6 +145,10 @@ class ProductController extends Controller
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'variants.*.sku' => 'nullable|string|max:100',
         ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Illuminate\Support\Facades\Log::error('Validation failed during product update: ', $e->errors());
+            throw $e;
+        }
 
         if (isset($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
@@ -185,12 +192,16 @@ class ProductController extends Controller
             }
         }
 
+        \Illuminate\Support\Facades\Cache::forget('storefront_home_data');
+
         return response()->json($product->load(['images', 'variants', 'category']));
     }
 
     public function destroy(Product $product)
     {
         $product->delete();
+        \Illuminate\Support\Facades\Cache::forget('storefront_home_data');
+
         return response()->json(['message' => 'Product deleted successfully']);
     }
 }

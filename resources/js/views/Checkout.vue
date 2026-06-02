@@ -6,7 +6,7 @@
       </div>
       <div class="space-y-3">
         <h1 class="text-4xl font-extrabold tracking-tight">Order Placed Successfully!</h1>
-        <p class="text-slate-500 dark:text-slate-400">Thank you for shopping with Paowajai. Your order number is <strong class="text-slate-900 dark:text-white">{{ successOrder.order_number }}</strong>.</p>
+        <p class="text-slate-500 dark:text-slate-400">Thank you for shopping with Paowazay. Your order number is <strong class="text-slate-900 dark:text-white">{{ successOrder.order_number }}</strong>.</p>
       </div>
       <div class="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl max-w-md mx-auto text-left space-y-4">
         <h3 class="font-bold border-b pb-2">Delivery Details</h3>

@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: paowajai-app
+    image: paowazay-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -20,11 +20,11 @@ services:
       redis:
         condition: service_started
     networks:
-      - paowajai-network
+      - paowazay-network
 
   # Queue Worker
   queue:
-    image: paowajai-app
+    image: paowazay-app
     restart: unless-stopped
     working_dir: /var/www/html
     command: php artisan queue:work --verbose --tries=3 --timeout=90
@@ -33,7 +33,7 @@ services:
     depends_on:
       - app
     networks:
-      - paowajai-network
+      - paowazay-network
 
   # Nginx Reverse Proxy
   web:
@@ -47,7 +47,7 @@ services:
     depends_on:
       - app
     networks:
-      - paowajai-network
+      - paowazay-network
 
   # MySQL Database Server
   mysql:
@@ -56,12 +56,12 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_DATABASE: paowajai
-      MYSQL_USER: paowajai_user
+      MYSQL_DATABASE: paowazay
+      MYSQL_USER: paowazay_user
       MYSQL_PASSWORD: secret_password
       MYSQL_ROOT_PASSWORD: root_secret_password
     volumes:
-      - paowajai-db-data:/var/lib/mysql
+      - paowazay-db-data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_secret_password"]
       interval: 5s
@@ -69,7 +69,7 @@ services:
       retries: 10
       start_period: 30s
     networks:
-      - paowajai-network
+      - paowazay-network
 
   # Redis Cache & Queue Backend
   redis:
@@ -78,16 +78,16 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - paowajai-redis-data:/data
+      - paowazay-redis-data:/data
     networks:
-      - paowajai-network
+      - paowazay-network
 
 networks:
-  paowajai-network:
+  paowazay-network:
     driver: bridge
 
 volumes:
-  paowajai-db-data:
+  paowazay-db-data:
     driver: local
-  paowajai-redis-data:
+  paowazay-redis-data:
     driver: local

@@ -1,4 +1,4 @@
-# 📦 Paowajai Enterprise Ecommerce Platform
+# 📦 Paowazay Enterprise Ecommerce Platform
 
 A premium, production-ready full-stack e-commerce platform built for high-performance importing and retailing. Features a modular Laravel 12 API-first backend, interactive Vue.js 3 storefront SPA with custom glassmorphism styles, automated Pathao/RedX courier bookings, integrated mobile payments (bKash/Nagad/SSLCommerz), and full Redis caching.
 
@@ -37,7 +37,7 @@ Connect this codebase with your GitHub account:
 git branch -M main
 
 # Add your repository as origin remote
-git remote add origin https://github.com/shagorAkon/paowajai.git
+git remote add origin https://github.com/shagorAkon/paowazay.git
 
 # Push current main branch to remote origin
 git push -u origin main

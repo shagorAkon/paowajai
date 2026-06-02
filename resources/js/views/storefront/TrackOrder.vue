@@ -100,7 +100,10 @@
               <div v-for="item in order.items" :key="item.id" class="flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700">
                 <img :src="item.product?.images?.[0] ? `/storage/${item.product.images[0]}` : 'https://placehold.co/60x60'" class="w-14 h-14 rounded-lg object-cover bg-slate-100" />
                 <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-slate-900 dark:text-white truncate">{{ item.product_name }}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="font-semibold text-slate-900 dark:text-white truncate">{{ item.product_name }}</p>
+                    <span :class="itemStatusBadgeClass(item.status)" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">{{ item.status || 'pending' }}</span>
+                  </div>
                   <p v-if="item.variant_label" class="text-xs text-slate-500">{{ item.variant_label }}</p>
                 </div>
                 <div class="text-right">
@@ -196,6 +199,16 @@ const statusBadgeClass = (status) => {
     refunded: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
   };
   return map[status] || 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
+};
+
+const itemStatusBadgeClass = (status) => {
+  const map = {
+    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+    accepted: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    shipped: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-400',
+    rejected: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+  };
+  return map[status || 'pending'] || 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
 };
 
 onMounted(() => {

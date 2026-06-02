@@ -20,10 +20,10 @@ class InvoiceController extends Controller
         $data = [
             'order' => $order,
             'qrCode' => 'data:image/svg+xml;base64,' . $qrCode,
-            'company_name' => 'Paowajai Ecommerce',
+            'company_name' => 'Paowazay Ecommerce',
             'company_address' => 'Dhaka, Bangladesh',
             'company_phone' => '+880 123 456 7890',
-            'company_email' => 'support@paowajai.com'
+            'company_email' => 'support@paowazay.com'
         ];
 
         // Normally we'd render a view here, but since this is an API, we can either

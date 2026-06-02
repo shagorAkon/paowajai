@@ -22,6 +22,7 @@ import AdminOrderDetails from '../views/admin/OrderDetails.vue';
 import AdminInventory from '../views/admin/Inventory.vue';
 import AdminMarketing from '../views/admin/Marketing.vue';
 import AdminSettings from '../views/admin/Settings.vue';
+import CustomizeHome from '../views/admin/CustomizeHome.vue';
 
 const routes = [
     // --- Public Routes ---
@@ -137,6 +138,12 @@ const routes = [
         path: '/admin/settings',
         name: 'admin.settings',
         component: AdminSettings,
+        meta: { layout: 'admin', requiresAuth: true, isAdmin: true }
+    },
+    {
+        path: '/admin/customize-home',
+        name: 'admin.customizeHome',
+        component: CustomizeHome,
         meta: { layout: 'admin', requiresAuth: true, isAdmin: true }
     },
     {

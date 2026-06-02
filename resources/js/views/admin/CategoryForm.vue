@@ -33,12 +33,23 @@
 
       <div>
         <label class="block text-sm font-semibold mb-2">Category Image/Banner</label>
+        <div v-if="form.image && !imageFile" class="mb-4">
+          <img :src="`/storage/${form.image}`" alt="Category Image" class="w-32 h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
+        </div>
+        <div v-else-if="imagePreview" class="mb-4">
+          <img :src="imagePreview" alt="Category Image Preview" class="w-32 h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
+        </div>
         <input type="file" @change="handleUpload" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
       </div>
 
       <div class="flex items-center gap-3 pt-4 border-t dark:border-slate-700">
         <input v-model="form.is_active" type="checkbox" id="active" class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
         <label for="active" class="font-semibold cursor-pointer">Active (Visible)</label>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4 border-t dark:border-slate-700">
+        <input v-model="form.is_featured" type="checkbox" id="featured" class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+        <label for="featured" class="font-semibold cursor-pointer">Featured (Show on Home Page)</label>
       </div>
     </div>
   </div>
@@ -56,12 +67,14 @@ const isEdit = route.name === 'admin.categories.edit';
 const loading = ref(false);
 const parentOptions = ref([]);
 const imageFile = ref(null);
+const imagePreview = ref(null);
 
 const form = ref({
   name: '',
   parent_id: null,
   description: '',
-  is_active: true
+  is_active: true,
+  is_featured: false
 });
 
 const fetchParents = async () => {
@@ -75,7 +88,11 @@ const fetchCategory = async () => {
 };
 
 const handleUpload = (e) => {
-  imageFile.value = e.target.files[0];
+  const file = e.target.files[0];
+  if (file) {
+    imageFile.value = file;
+    imagePreview.value = URL.createObjectURL(file);
+  }
 };
 
 const saveCategory = async () => {
@@ -86,6 +103,7 @@ const saveCategory = async () => {
     if(form.value.parent_id) formData.append('parent_id', form.value.parent_id);
     if(form.value.description) formData.append('description', form.value.description);
     formData.append('is_active', form.value.is_active ? 1 : 0);
+    formData.append('is_featured', form.value.is_featured ? 1 : 0);
     if(imageFile.value) formData.append('image', imageFile.value);
 
     if (isEdit) {
@@ -96,7 +114,8 @@ const saveCategory = async () => {
     }
     router.push('/admin/categories');
   } catch (err) {
-    alert('Failed to save category');
+    console.error(err.response?.data);
+    alert(err.response?.data?.message || 'Failed to save category');
   } finally {
     loading.value = false;
   }

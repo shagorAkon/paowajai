@@ -48,6 +48,13 @@ opcache.save_comments=1
 opcache.fast_shutdown=1
 EOF
 
+# Configure PHP Upload Limits
+COPY <<EOF /usr/local/etc/php/conf.d/uploads.ini
+[PHP]
+post_max_size = 10M
+upload_max_filesize = 10M
+EOF
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

@@ -10,7 +10,7 @@
           </svg>
         </button>
         <router-link to="/" class="flex items-center gap-2">
-          <span class="text-2xl font-black tracking-tighter text-gradient">PAOWAJAI</span>
+          <span class="text-2xl font-black tracking-tighter text-gradient">PAOWAZAY</span>
         </router-link>
       </div>
 

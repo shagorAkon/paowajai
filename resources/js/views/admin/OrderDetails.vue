@@ -33,6 +33,15 @@
                 <p class="font-bold text-slate-900">{{ item.product_name }}</p>
                 <p class="text-sm text-slate-500" v-if="item.variant_label">Variant: {{ item.variant_label }}</p>
                 <p class="text-sm text-slate-500">Qty: {{ item.quantity }} × ৳ {{ item.price }}</p>
+                <div class="mt-2 flex items-center gap-2">
+                  <span class="text-xs font-semibold uppercase text-slate-400">Status:</span>
+                  <select v-model="item.status" @change="updateItemStatus(item)" class="text-xs font-bold uppercase rounded border border-slate-200 px-2 py-1 bg-slate-50 text-slate-700 outline-none focus:ring-1 focus:ring-primary-500">
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
               </div>
               <div class="font-black text-primary-600">
                 ৳ {{ item.total }}
@@ -164,6 +173,19 @@ const updateOrderStatus = async () => {
     fetchOrder();
   } catch (err) {
     alert('Failed to update status');
+  }
+};
+
+const updateItemStatus = async (item) => {
+  try {
+    const { data } = await api.patch(`/admin/orders/${order.value.id}/items/${item.id}/status`, { status: item.status });
+    // The API returns the fully updated order (with new subtotals)
+    order.value = data;
+    alert('Item status updated successfully');
+  } catch (err) {
+    alert('Failed to update item status');
+    // Revert visually by refetching order
+    fetchOrder();
   }
 };
 

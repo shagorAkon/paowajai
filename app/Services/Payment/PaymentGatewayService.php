@@ -152,7 +152,7 @@ class PaymentGatewayService
                 'fail_url' => url("/api/v1/payments/sslcommerz/callback?status=fail"),
                 'cancel_url' => url("/api/v1/payments/sslcommerz/callback?status=cancel"),
                 'cus_name' => $order->customer_name,
-                'cus_email' => $order->customer_email ?? 'customer@paowajai.com',
+                'cus_email' => $order->customer_email ?? 'customer@paowazay.com',
                 'cus_phone' => $order->customer_phone,
                 'cus_add1' => $order->shipping_address,
                 'cus_city' => $order->shipping_city,

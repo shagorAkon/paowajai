@@ -1,13 +1,23 @@
 <template>
   <div class="flex h-screen bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white font-sans overflow-hidden transition-colors duration-300">
     
+    <!-- Mobile Sidebar Backdrop -->
+    <div 
+      v-if="sidebarOpen" 
+      class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-20 md:hidden transition-opacity"
+      @click="sidebarOpen = false"
+    ></div>
+
     <!-- Sidebar -->
-    <aside :class="['bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-all duration-300 z-20 shadow-sm', sidebarOpen ? 'w-64' : 'w-20']">
+    <aside :class="[
+      'bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-transform duration-300 z-30 shadow-sm fixed md:relative h-full',
+      sidebarOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full md:w-20 md:translate-x-0'
+    ]">
       <!-- Logo area -->
       <div class="h-16 flex items-center justify-center border-b border-slate-200 dark:border-slate-700">
         <router-link to="/admin" class="flex items-center gap-2 overflow-hidden">
           <svg class="w-8 h-8 text-primary-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-          <span v-if="sidebarOpen" class="font-black text-xl tracking-tighter text-gradient animate-fade-in whitespace-nowrap">PAOWAJAI</span>
+          <span v-if="sidebarOpen" class="font-black text-xl tracking-tighter text-gradient animate-fade-in whitespace-nowrap">PAOWAZAY</span>
         </router-link>
       </div>
 
@@ -24,8 +34,8 @@
           <component :is="item.icon" class="w-5 h-5 shrink-0" />
           <span v-if="sidebarOpen" class="font-medium whitespace-nowrap">{{ item.name }}</span>
           
-          <!-- Tooltip for collapsed mode -->
-          <div v-if="!sidebarOpen" class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap transition-opacity">
+          <!-- Tooltip for collapsed mode (Desktop Only) -->
+          <div v-if="!sidebarOpen" class="hidden md:block absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap transition-opacity">
             {{ item.name }}
           </div>
         </router-link>
@@ -122,14 +132,16 @@ import {
   ArchiveBoxIcon,
   TagIcon,
   MegaphoneIcon,
-  DocumentChartBarIcon
+  DocumentChartBarIcon,
+  PhotoIcon
 } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const sidebarOpen = ref(true);
+// Default to hidden on mobile, open on desktop
+const sidebarOpen = ref(window.innerWidth >= 768);
 const showNotifications = ref(false);
 const unreadCount = ref(0);
 const notifications = ref([]);
@@ -193,6 +205,7 @@ const menuItems = [
   { name: 'Inventory', path: '/admin/inventory', icon: ArchiveBoxIcon, role: 'Super Admin' },
   { name: 'Marketing', path: '/admin/marketing', icon: MegaphoneIcon },
   { name: 'Customers', path: '/admin/customers', icon: UsersIcon },
+  { name: 'Customize Home Page', path: '/admin/customize-home', icon: PhotoIcon, role: 'Super Admin' },
   { name: 'Settings', path: '/admin/settings', icon: Cog8ToothIcon, role: 'Super Admin' },
 ];
 </script>
