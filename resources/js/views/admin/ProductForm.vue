@@ -61,14 +61,14 @@
           <div v-show="activeTab === 'pricing'" class="space-y-6 animate-fade-in">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Regular Price <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Selling Price <span class="text-red-500">*</span></label>
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">৳</span>
                   <input v-model="form.price" type="number" step="0.01" class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none dark:text-white">
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Compare at Price</label>
+                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Original Price (Crossed out)</label>
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">৳</span>
                   <input v-model="form.compare_price" type="number" step="0.01" class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 outline-none dark:text-white">

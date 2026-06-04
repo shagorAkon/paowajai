@@ -33,8 +33,6 @@ class HomeController extends Controller
                 ->get();
 
             $categories = \App\Models\Category::active()
-                ->rootCategories()
-                ->featured()
                 ->orderBy('sort_order')
                 ->limit(8)
                 ->get();

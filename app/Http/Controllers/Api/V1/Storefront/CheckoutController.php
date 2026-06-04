@@ -36,7 +36,7 @@ class CheckoutController extends Controller
 
             foreach ($validated['items'] as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                $price = $product->price;
+                $price = $product->effective_price;
                 $variantLabel = null;
 
                 if (!empty($item['variant_id'])) {

@@ -13,11 +13,19 @@
       
       <!-- Image Gallery -->
       <div class="space-y-4">
-        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border">
+        <div 
+          class="aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border cursor-zoom-in relative group"
+          ref="imageContainer"
+          @mouseenter="isZoomed = true"
+          @mouseleave="isZoomed = false"
+          @mousemove="handleZoom"
+        >
           <img 
             :src="activeImage ? `/storage/${activeImage}` : 'https://placehold.co/600x600'" 
             :alt="productStore.currentProduct.name"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-cover transition-transform duration-200"
+            :class="isZoomed ? 'scale-[2.5]' : 'scale-100'"
+            :style="{ transformOrigin: `${zoomX}% ${zoomY}%` }"
           >
         </div>
         <div v-if="productStore.currentProduct.images?.length" class="flex gap-4 overflow-x-auto pb-2">
@@ -54,8 +62,8 @@
           <span class="text-3xl font-black text-slate-900 dark:text-white">
             ৳ {{ formatPrice(displayPrice) }}
           </span>
-          <span v-if="productStore.currentProduct.compare_price > productStore.currentProduct.price" class="text-lg text-slate-400 line-through">
-            ৳ {{ formatPrice(productStore.currentProduct.compare_price) }}
+          <span v-if="!selectedVariant && displayPrice < Math.max(productStore.currentProduct.compare_price || 0, productStore.currentProduct.price)" class="text-lg text-slate-400 line-through">
+            ৳ {{ formatPrice(Math.max(productStore.currentProduct.compare_price || 0, productStore.currentProduct.price)) }}
           </span>
         </div>
 
@@ -110,6 +118,14 @@
       </div>
     </div>
 
+    <!-- Product Full Description -->
+    <section v-if="productStore.currentProduct?.description" class="space-y-6 pt-12 border-t dark:border-slate-800">
+      <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Product Details</h2>
+      <div class="prose prose-slate dark:prose-invert max-w-none prose-lg whitespace-pre-line text-slate-600 dark:text-slate-300">
+        {{ productStore.currentProduct.description }}
+      </div>
+    </section>
+
     <!-- Related Products -->
     <section v-if="relatedProducts.length" class="space-y-8">
       <h2 class="text-3xl font-extrabold tracking-tight">You May Also Like</h2>
@@ -140,11 +156,32 @@ const selectedVariant = ref(null);
 const quantity = ref(1);
 const relatedProducts = ref([]);
 
+// Image Zoom Logic
+const imageContainer = ref(null);
+const isZoomed = ref(false);
+const zoomX = ref(50);
+const zoomY = ref(50);
+
+const handleZoom = (e) => {
+  if (!imageContainer.value) return;
+  const { left, top, width, height } = imageContainer.value.getBoundingClientRect();
+  zoomX.value = ((e.clientX - left) / width) * 100;
+  zoomY.value = ((e.clientY - top) / height) * 100;
+};
+
 const displayPrice = computed(() => {
   if (selectedVariant.value && selectedVariant.value.price) {
     return selectedVariant.value.price;
   }
-  return productStore.currentProduct?.effective_price || productStore.currentProduct?.price || 0;
+  
+  const price = productStore.currentProduct?.price || 0;
+  const comparePrice = productStore.currentProduct?.compare_price;
+  
+  if (comparePrice && comparePrice != price) {
+    return Math.min(price, comparePrice);
+  }
+  
+  return productStore.currentProduct?.effective_price || price;
 });
 
 const stockQuantity = computed(() => {

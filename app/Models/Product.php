@@ -24,6 +24,11 @@ class Product extends Model
         'view_count', 'sold_count',
     ];
 
+    protected $appends = [
+        'effective_price',
+        'discount_percentage',
+    ];
+
     protected $casts = [
         'price' => 'decimal:2',
         'compare_price' => 'decimal:2',

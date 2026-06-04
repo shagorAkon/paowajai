@@ -13,8 +13,8 @@
       <!-- Badges -->
       <div class="absolute top-3 left-3 flex flex-col gap-2">
         <span v-if="product.is_flash_sale" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">Flash Sale</span>
-        <span v-if="product.compare_price > product.price" class="bg-slate-900 text-white text-xs font-bold px-2 py-1 rounded-md">
-          -{{ Math.round(((product.compare_price - product.price) / product.compare_price) * 100) }}%
+        <span v-if="(product.effective_price || product.price) < Math.max(product.compare_price || 0, product.price)" class="bg-slate-900 text-white text-xs font-bold px-2 py-1 rounded-md">
+          -{{ Math.round(((Math.max(product.compare_price || 0, product.price) - (product.effective_price || product.price)) / Math.max(product.compare_price || 0, product.price)) * 100) }}%
         </span>
       </div>
 
@@ -37,11 +37,11 @@
       
       <div class="mt-auto pt-4 flex items-center justify-between">
         <div class="flex flex-col">
-          <span v-if="product.compare_price > product.price" class="text-xs text-slate-400 line-through">
-            ৳ {{ formatPrice(product.compare_price) }}
+          <span v-if="(product.effective_price || product.price) < Math.max(product.compare_price || 0, product.price)" class="text-xs text-slate-400 line-through">
+            ৳ {{ formatPrice(Math.max(product.compare_price || 0, product.price)) }}
           </span>
           <span class="font-black text-lg text-slate-900 dark:text-white">
-            ৳ {{ formatPrice(product.price) }}
+            ৳ {{ formatPrice(product.effective_price || product.price) }}
           </span>
         </div>
         

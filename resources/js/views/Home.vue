@@ -189,6 +189,28 @@
       </div>
     </section>
 
+    <!-- New Arrivals -->
+    <section v-if="productStore.homeData?.new_arrivals?.length" class="container mx-auto px-4">
+      <div class="flex items-end justify-between mb-12">
+        <div>
+          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">New Arrivals</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-2">Check out the latest products added to our store.</p>
+        </div>
+        <router-link to="/products" class="text-primary-500 font-bold hover:underline flex items-center gap-1">
+          View All
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </router-link>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <ProductCard 
+          v-for="product in productStore.homeData?.new_arrivals" 
+          :key="product.id" 
+          :product="product" 
+        />
+      </div>
+    </section>
+
     <!-- Newsletter CTA -->
     <section class="container mx-auto px-4">
       <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-12 text-center text-white premium-shadow relative overflow-hidden">
