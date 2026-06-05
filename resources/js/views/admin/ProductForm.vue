@@ -111,7 +111,7 @@
             <div>
               <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Primary Thumbnail</label>
               <div class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 text-center hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer relative overflow-hidden">
-                <input type="file" @change="handleThumbnailUpload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                <input type="file" @change="handleThumbnailUpload" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                 <div v-if="thumbnailPreview" class="relative">
                   <img :src="thumbnailPreview" class="max-h-48 mx-auto rounded-lg shadow-sm">
                   <p class="mt-2 text-sm text-primary-500 font-medium">Click to change thumbnail</p>
@@ -127,7 +127,7 @@
             <div>
               <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Gallery Images (Multiple)</label>
               <div class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 text-center hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer relative">
-                <input type="file" @change="handleGalleryUpload" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                <input type="file" @change="handleGalleryUpload" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                 <svg class="mx-auto h-8 w-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 <p class="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">Select multiple images</p>
               </div>
@@ -263,6 +263,7 @@ const thumbnailFile = ref(null);
 const thumbnailPreview = ref('');
 const galleryFiles = ref([]);
 const galleryPreviews = ref([]);
+const removedGalleryIds = ref([]);
 
 const form = ref({
   name: '',
@@ -315,6 +316,15 @@ const fetchProduct = async () => {
     if (data.thumbnail) {
       thumbnailPreview.value = `/storage/${data.thumbnail}`;
     }
+    if (data.images && data.images.length > 0) {
+      data.images.forEach(img => {
+        galleryPreviews.value.push({ 
+          id: img.id, 
+          url: `/storage/${img.image_path}`, 
+          isExisting: true 
+        });
+      });
+    }
   } catch (err) {
     console.error(err);
   }
@@ -330,13 +340,15 @@ const handleThumbnailUpload = (e) => {
 const handleGalleryUpload = (e) => {
   const files = Array.from(e.target.files);
   files.forEach(f => {
-    galleryFiles.value.push(f);
-    galleryPreviews.value.push({ file: f, url: URL.createObjectURL(f) });
+    galleryPreviews.value.push({ file: f, url: URL.createObjectURL(f), isExisting: false });
   });
 };
 
 const removeGalleryItem = (idx) => {
-  galleryFiles.value.splice(idx, 1);
+  const item = galleryPreviews.value[idx];
+  if (item.isExisting) {
+    removedGalleryIds.value.push(item.id);
+  }
   galleryPreviews.value.splice(idx, 1);
 };
 
@@ -366,8 +378,16 @@ const saveProduct = async () => {
 
     if (thumbnailFile.value) formData.append('thumbnail', thumbnailFile.value);
     
-    galleryFiles.value.forEach((file, idx) => {
-      formData.append(`gallery[${idx}]`, file);
+    let newImgIdx = 0;
+    galleryPreviews.value.forEach(item => {
+      if (!item.isExisting && item.file) {
+        formData.append(`gallery[${newImgIdx}]`, item.file);
+        newImgIdx++;
+      }
+    });
+
+    removedGalleryIds.value.forEach(id => {
+      formData.append('removed_gallery_ids[]', id);
     });
 
     form.value.variants.forEach((v, idx) => {

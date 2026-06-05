@@ -184,7 +184,7 @@ const form = reactive({
 
 const updateShipping = () => {
   if (form.shipping_division.toLowerCase() === 'dhaka') {
-    shippingCost.value = 60;
+    shippingCost.value = 100;
   } else {
     shippingCost.value = 120;
   }

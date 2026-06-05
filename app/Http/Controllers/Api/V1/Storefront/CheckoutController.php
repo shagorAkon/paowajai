@@ -75,7 +75,7 @@ class CheckoutController extends Controller
             }
 
             // Mock Shipping Cost (In a real app, query from Settings table)
-            $shippingCost = strtolower($validated['shipping_city']) === 'dhaka' ? 60 : 120;
+            $shippingCost = strtolower($validated['shipping_city']) === 'dhaka' ? 100 : 120;
             $total = $subtotal + $shippingCost;
 
             $order = Order::create([

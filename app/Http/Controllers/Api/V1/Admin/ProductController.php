@@ -144,6 +144,9 @@ class ProductController extends Controller
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock_quantity' => 'nullable|integer|min:0',
             'variants.*.sku' => 'nullable|string|max:100',
+            'gallery.*' => 'nullable|image|max:10240',
+            'removed_gallery_ids' => 'nullable|array',
+            'removed_gallery_ids.*' => 'integer',
         ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Illuminate\Support\Facades\Log::error('Validation failed during product update: ', $e->errors());
@@ -163,9 +166,25 @@ class ProductController extends Controller
             $validated['thumbnail'] = $request->file('thumbnail')->store('products/thumbnails', 'public');
         }
 
-        // Exclude variants from base product update
-        $productData = collect($validated)->except(['variants'])->toArray();
+        $productData = collect($validated)->except(['variants', 'gallery', 'removed_gallery_ids'])->toArray();
         $product->update($productData);
+
+        // Handle gallery images
+        if ($request->has('removed_gallery_ids')) {
+            $product->images()->whereIn('id', $request->removed_gallery_ids)->delete();
+        }
+
+        if ($request->hasFile('gallery')) {
+            $maxSortOrder = $product->images()->max('sort_order') ?? -1;
+            foreach ($request->file('gallery') as $index => $image) {
+                $path = $image->store('products/gallery', 'public');
+                $product->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => $maxSortOrder + 1 + $index,
+                    'is_primary' => false,
+                ]);
+            }
+        }
 
         // Handle variants
         if ($request->has('variants')) {

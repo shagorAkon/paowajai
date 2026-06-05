@@ -11,10 +11,10 @@
 
     <div v-else-if="productStore.currentProduct" class="grid grid-cols-1 md:grid-cols-2 gap-12">
       
-      <!-- Image Gallery -->
-      <div class="space-y-4">
+      <!-- Image Gallery with Zoom -->
+      <div class="space-y-4 relative z-20">
         <div 
-          class="aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border cursor-zoom-in relative group"
+          class="aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border relative group cursor-crosshair"
           ref="imageContainer"
           @mouseenter="isZoomed = true"
           @mouseleave="isZoomed = false"
@@ -23,16 +23,39 @@
           <img 
             :src="activeImage ? `/storage/${activeImage}` : 'https://placehold.co/600x600'" 
             :alt="productStore.currentProduct.name"
-            class="w-full h-full object-cover transition-transform duration-200"
-            :class="isZoomed ? 'scale-[2.5]' : 'scale-100'"
-            :style="{ transformOrigin: `${zoomX}% ${zoomY}%` }"
+            class="w-full h-full object-cover"
+            ref="zoomImage"
           >
+          <!-- Lens Overlay Box (Only visible on md+ screens) -->
+          <div 
+            v-show="isZoomed"
+            class="absolute border border-primary-500 bg-primary-500/20 pointer-events-none hidden md:block"
+            :style="{
+              width: lensWidth + 'px',
+              height: lensHeight + 'px',
+              left: lensLeft + 'px',
+              top: lensTop + 'px',
+            }"
+          ></div>
         </div>
+
+        <!-- Zoomed Pane (Side) -->
+        <div
+          v-show="isZoomed"
+          class="absolute top-0 left-[calc(100%+3rem)] w-full aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 pointer-events-none hidden md:block overflow-hidden"
+          :style="{
+             backgroundImage: `url(${activeImage ? '/storage/' + activeImage : 'https://placehold.co/600x600'})`,
+             backgroundSize: `${zoomLevel * 100}%`,
+             backgroundPosition: `${zoomBgX}% ${zoomBgY}%`,
+             backgroundRepeat: 'no-repeat',
+          }"
+        ></div>
+
         <div v-if="productStore.currentProduct.images?.length" class="flex gap-4 overflow-x-auto pb-2">
           <button 
             @click="activeImage = productStore.currentProduct.thumbnail"
-            class="w-20 h-20 rounded-lg overflow-hidden border bg-slate-50 flex-shrink-0"
-            :class="[activeImage === productStore.currentProduct.thumbnail ? 'border-primary-500 ring-2 ring-primary-500/20' : '']"
+            class="w-20 h-20 rounded-lg overflow-hidden border bg-slate-50 flex-shrink-0 transition-all duration-200"
+            :class="[activeImage === productStore.currentProduct.thumbnail ? 'border-primary-500 ring-2 ring-primary-500/20' : 'hover:border-slate-400']"
           >
             <img :src="`/storage/${productStore.currentProduct.thumbnail}`" class="w-full h-full object-cover">
           </button>
@@ -40,8 +63,8 @@
             v-for="img in productStore.currentProduct.images" 
             :key="img.id"
             @click="activeImage = img.image_path"
-            class="w-20 h-20 rounded-lg overflow-hidden border bg-slate-50 flex-shrink-0"
-            :class="[activeImage === img.image_path ? 'border-primary-500 ring-2 ring-primary-500/20' : '']"
+            class="w-20 h-20 rounded-lg overflow-hidden border bg-slate-50 flex-shrink-0 transition-all duration-200"
+            :class="[activeImage === img.image_path ? 'border-primary-500 ring-2 ring-primary-500/20' : 'hover:border-slate-400']"
           >
             <img :src="`/storage/${img.image_path}`" class="w-full h-full object-cover">
           </button>
@@ -119,10 +142,25 @@
     </div>
 
     <!-- Product Full Description -->
-    <section v-if="productStore.currentProduct?.description" class="space-y-6 pt-12 border-t dark:border-slate-800">
-      <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Product Details</h2>
-      <div class="prose prose-slate dark:prose-invert max-w-none prose-lg whitespace-pre-line text-slate-600 dark:text-slate-300">
-        {{ productStore.currentProduct.description }}
+    <section v-if="productStore.currentProduct?.description" class="pt-12 border-t dark:border-slate-800">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <!-- Tab Header -->
+        <div class="flex border-b border-slate-200 dark:border-slate-700">
+          <button class="px-8 py-4 text-sm font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400 border-b-2 border-primary-500 bg-primary-50/50 dark:bg-primary-500/10">
+            Product Details
+          </button>
+        </div>
+        <!-- Description Content -->
+        <div class="p-6 lg:p-8">
+          <div 
+            class="prose prose-slate dark:prose-invert max-w-none prose-lg text-slate-600 dark:text-slate-300 
+                   prose-headings:text-slate-900 dark:prose-headings:text-white
+                   prose-a:text-primary-600 dark:prose-a:text-primary-400
+                   prose-strong:text-slate-900 dark:prose-strong:text-white
+                   prose-img:rounded-xl prose-img:shadow-md"
+            v-html="productStore.currentProduct.description"
+          ></div>
+        </div>
       </div>
     </section>
 
@@ -156,17 +194,49 @@ const selectedVariant = ref(null);
 const quantity = ref(1);
 const relatedProducts = ref([]);
 
-// Image Zoom Logic
+// Image Zoom Logic — Side Pane
 const imageContainer = ref(null);
+const zoomImage = ref(null);
 const isZoomed = ref(false);
-const zoomX = ref(50);
-const zoomY = ref(50);
+const zoomLevel = 2.5; // how much to magnify
+const lensWidth = ref(0);
+const lensHeight = ref(0);
+const lensLeft = ref(0);
+const lensTop = ref(0);
+const zoomBgX = ref(50);
+const zoomBgY = ref(50);
 
 const handleZoom = (e) => {
   if (!imageContainer.value) return;
-  const { left, top, width, height } = imageContainer.value.getBoundingClientRect();
-  zoomX.value = ((e.clientX - left) / width) * 100;
-  zoomY.value = ((e.clientY - top) / height) * 100;
+  const rect = imageContainer.value.getBoundingClientRect();
+  
+  const containerWidth = rect.width;
+  const containerHeight = rect.height;
+  
+  // Calculate lens dimensions based on container and zoom level
+  lensWidth.value = containerWidth / zoomLevel;
+  lensHeight.value = containerHeight / zoomLevel;
+  
+  // Mouse position relative to container
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  
+  // Position lens centered on cursor
+  let left = mouseX - lensWidth.value / 2;
+  let top = mouseY - lensHeight.value / 2;
+  
+  // Clamp to boundaries so lens doesn't go outside image
+  if (left < 0) left = 0;
+  if (top < 0) top = 0;
+  if (left + lensWidth.value > containerWidth) left = containerWidth - lensWidth.value;
+  if (top + lensHeight.value > containerHeight) top = containerHeight - lensHeight.value;
+  
+  lensLeft.value = left;
+  lensTop.value = top;
+  
+  // Calculate background position percentage for the zoomed view
+  zoomBgX.value = (left / (containerWidth - lensWidth.value)) * 100 || 0;
+  zoomBgY.value = (top / (containerHeight - lensHeight.value)) * 100 || 0;
 };
 
 const displayPrice = computed(() => {
@@ -221,3 +291,4 @@ onMounted(() => {
   loadProductData();
 });
 </script>
+

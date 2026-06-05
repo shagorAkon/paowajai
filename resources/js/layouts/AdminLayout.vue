@@ -176,7 +176,40 @@ const fetchNotifications = async () => {
 };
 
 const markAsRead = async (notif) => {
+  // Close the notifications dropdown
+  showNotifications.value = false;
+
+  // Handle data parsing if it's a string
+  let payload = notif.data;
+  if (typeof payload === 'string') {
+    try {
+      payload = JSON.parse(payload);
+    } catch (e) {}
+  }
+
+  let orderId = payload?.order_id;
+
+  // If order_id is missing from old notifications, fetch it using order_number
+  if (!orderId && payload?.order_number) {
+    try {
+      const { data } = await api.get(`/admin/orders?search=${payload.order_number}`);
+      if (data.data && data.data.length > 0) {
+        orderId = data.data[0].id;
+      }
+    } catch (err) {
+      console.error('Failed to find order by number', err);
+    }
+  }
+
+  // Navigate to the specific order or fallback to the orders list
+  if (orderId) {
+    router.push({ name: 'admin.orders.show', params: { id: orderId } });
+  } else {
+    router.push('/admin/orders');
+  }
+
   if (notif.read_at) return; // already read
+
   try {
     await api.post(`/admin/dashboard/notifications/${notif.id}/read`);
     notif.read_at = new Date().toISOString();
