@@ -21,7 +21,9 @@ class CategoryController extends Controller
     public function show(string $slug)
     {
         $category = Category::with(['children', 'products' => function ($q) {
-                $q->active()->latest()->limit(20);
+                $q->with(['images', 'variants' => function($vq) {
+                    $vq->where('is_active', true);
+                }])->active()->latest()->limit(20);
             }])
             ->active()
             ->where('slug', $slug)

@@ -10,7 +10,9 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'images'])
+        $query = Product::with(['category', 'images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
             ->active();
 
         if ($request->filled('category')) {
@@ -58,12 +60,15 @@ class ProductController extends Controller
 
         $product->increment('view_count');
 
-        $relatedProducts = Product::active()
+        $relatedProducts = Product::with(['images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
+            ->active()
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->inRandomOrder()
             ->limit(8)
-            ->get(['id', 'name', 'slug', 'price', 'compare_price', 'thumbnail']);
+            ->get();
 
         return response()->json([
             'product' => $product,
@@ -73,7 +78,9 @@ class ProductController extends Controller
 
     public function featured()
     {
-        $products = Product::with('images')
+        $products = Product::with(['images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
             ->active()
             ->featured()
             ->latest()
@@ -85,7 +92,9 @@ class ProductController extends Controller
 
     public function flashSale()
     {
-        $products = Product::with('images')
+        $products = Product::with(['images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
             ->active()
             ->flashSale()
             ->get();

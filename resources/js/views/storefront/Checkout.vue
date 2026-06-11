@@ -54,9 +54,9 @@
               </div>
               <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             </label>
-            <label class="flex items-center justify-between p-4 border dark:border-slate-600 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" :class="{'border-primary-500 bg-primary-50 dark:bg-primary-900/30': form.payment_method === 'bkash'}">
+            <label class="flex items-center justify-between p-4 border dark:border-slate-600 rounded-xl opacity-60 cursor-not-allowed transition-colors">
               <div class="flex items-center gap-3">
-                <input type="radio" v-model="form.payment_method" value="bkash" class="w-5 h-5 text-primary-600 focus:ring-primary-500">
+                <input disabled type="radio" v-model="form.payment_method" value="bkash" class="w-5 h-5 text-slate-400 cursor-not-allowed">
                 <span class="font-bold text-slate-900 dark:text-white">bKash (Coming Soon)</span>
               </div>
             </label>

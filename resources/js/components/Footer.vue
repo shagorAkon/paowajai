@@ -69,19 +69,35 @@
       
       <!-- Bottom Footer -->
       <div class="border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-500 dark:text-slate-400 text-sm font-medium">
-        <p>&copy; {{ new Date().getFullYear() }} Paowazay. All rights reserved.</p>
+        <p>&copy; 2026 Paowazay. All rights reserved.</p>
         
         <!-- Payment Badges -->
         <div class="flex items-center gap-3">
-          <div class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-md text-xs font-bold">bKash</div>
-          <div class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-md text-xs font-bold">Nagad</div>
-          <div class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-md text-xs font-bold">Visa</div>
-          <div class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-md text-xs font-bold">Mastercard</div>
+          <svg class="h-8 w-auto hover:opacity-80 transition-opacity" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" title="bKash">
+            <rect width="48" height="32" rx="4" fill="#E2136E"/>
+            <path d="M24 10L16 18L24 22L32 14L24 10Z" fill="white"/>
+            <path d="M24 22L16 18L24 26L24 22Z" fill="#F4BBCF"/>
+          </svg>
+          <svg class="h-8 w-auto hover:opacity-80 transition-opacity" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" title="Nagad">
+            <rect width="48" height="32" rx="4" fill="#F36F21"/>
+            <path d="M24 8C18 8 14 14 14 20C14 26 18 30 24 30C30 30 34 26 34 20C34 14 30 8 24 8ZM24 24C21.8 24 20 22.2 20 20C20 17.8 21.8 16 24 16C26.2 16 28 17.8 28 20C28 22.2 26.2 24 24 24Z" fill="white"/>
+          </svg>
+          <svg class="h-8 w-auto hover:opacity-80 transition-opacity" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" title="Visa">
+            <rect width="48" height="32" rx="4" fill="#1434CB"/>
+            <text x="24" y="21" fill="white" font-family="Arial" font-weight="bold" font-style="italic" font-size="16" text-anchor="middle">VISA</text>
+          </svg>
+          <svg class="h-8 w-auto hover:opacity-80 transition-opacity" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" title="Mastercard">
+            <rect width="48" height="32" rx="4" fill="#1A1F36"/>
+            <circle cx="18" cy="16" r="8" fill="#EB001B"/>
+            <circle cx="30" cy="16" r="8" fill="#F79E1B" fill-opacity="0.8"/>
+          </svg>
         </div>
 
-        <div class="flex gap-6">
+        <div class="flex items-center gap-6">
           <a href="#" class="hover:text-primary-500 transition-colors">Privacy</a>
           <a href="#" class="hover:text-primary-500 transition-colors">Terms</a>
+          <span class="text-slate-300 dark:text-slate-700 hidden md:inline">|</span>
+          <span>Develop By <a href="https://www.linkedin.com/in/shagor-akon/" target="_blank" rel="noopener noreferrer" class="hover:text-primary-500 font-bold transition-colors">ShagorAkon</a></span>
         </div>
       </div>
     </div>

@@ -12,6 +12,8 @@
     </main>
 
     <Footer />
+    
+    <Toast />
 
     <!-- Simple Cart Slide-over -->
     <div v-if="cartStore.isOpen" class="fixed inset-0 z-[100] overflow-hidden">
@@ -41,8 +43,15 @@
                     <h3 class="font-semibold line-clamp-1 pr-4">{{ item.name }}</h3>
                     <button @click="cartStore.removeFromCart(item.product_id, item.variant_id)" class="text-red-500 hover:text-red-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                   </div>
-                  <p v-if="item.variant_label" class="text-xs text-slate-500">{{ item.variant_label }}</p>
-                  <div class="mt-auto flex items-center justify-between">
+                  <div v-if="item.variants && item.variants.length > 0" class="mt-1">
+                    <select :value="item.variant_id" @change="cartStore.updateItemVariant(item.product_id, item.variant_id, parseInt($event.target.value))" class="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded py-1 px-2 focus:outline-none focus:ring-1 focus:ring-primary-500 w-full max-w-[140px] truncate">
+                      <option v-for="v in item.variants" :key="v.id" :value="v.id">
+                        {{ v.label }}
+                      </option>
+                    </select>
+                  </div>
+                  <p v-else-if="item.variant_label" class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{{ item.variant_label }}</p>
+                  <div class="mt-auto flex items-center justify-between pt-2">
                     <div class="flex items-center border dark:border-slate-700 rounded-md">
                       <button @click="cartStore.updateQuantity(item.product_id, item.variant_id, item.quantity - 1)" class="px-3 py-1 hover:bg-slate-100 dark:hover:bg-slate-700">-</button>
                       <span class="px-3 text-sm font-medium">{{ item.quantity }}</span>
@@ -74,6 +83,7 @@
 <script setup>
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import Toast from '../components/Toast.vue';
 import { useCartStore } from '../stores/useCartStore';
 
 const cartStore = useCartStore();

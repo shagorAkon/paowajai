@@ -19,14 +19,18 @@ class HomeController extends Controller
                 ->position('popup')
                 ->first();
 
-            $featuredProducts = \App\Models\Product::with('images')
+            $featuredProducts = \App\Models\Product::with(['images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
                 ->active()
                 ->featured()
                 ->latest()
                 ->limit(8)
                 ->get();
 
-            $flashSaleProducts = \App\Models\Product::with('images')
+            $flashSaleProducts = \App\Models\Product::with(['images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
                 ->active()
                 ->flashSale()
                 ->limit(8)
@@ -37,7 +41,9 @@ class HomeController extends Controller
                 ->limit(8)
                 ->get();
 
-            $newArrivals = \App\Models\Product::with('images')
+            $newArrivals = \App\Models\Product::with(['images', 'variants' => function ($q) {
+                $q->where('is_active', true);
+            }])
                 ->active()
                 ->latest()
                 ->limit(8)

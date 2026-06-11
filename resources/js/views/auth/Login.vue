@@ -23,7 +23,7 @@
               type="email" 
               required
               class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors outline-none dark:text-white"
-              placeholder="admin@paowazay.com"
+              placeholder="Enter User Name"
             >
           </div>
 

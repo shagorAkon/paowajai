@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useToastStore } from './useToastStore';
 
 export const useCartStore = defineStore('cart', {
     state: () => ({
@@ -37,12 +38,16 @@ export const useCartStore = defineStore('cart', {
                     variant_label: variantLabel,
                     price: parseFloat(price),
                     quantity: quantity,
-                    max_stock: variant ? variant.stock_quantity : product.stock_quantity
+                    max_stock: variant ? variant.stock_quantity : product.stock_quantity,
+                    variants: product.variants || []
                 });
             }
 
             this.saveCart();
             this.isOpen = true; // Open cart feedback
+            
+            const toast = useToastStore();
+            toast.add(`${product.name} has been added to your cart!`, 'success');
         },
 
         updateQuantity(productId, variantId, quantity) {
@@ -52,6 +57,33 @@ export const useCartStore = defineStore('cart', {
                     this.removeFromCart(productId, variantId);
                 } else {
                     item.quantity = Math.min(quantity, item.max_stock || 99);
+                    this.saveCart();
+                }
+            }
+        },
+
+        updateItemVariant(productId, oldVariantId, newVariantId) {
+            const itemIndex = this.items.findIndex(i => i.product_id === productId && i.variant_id === oldVariantId);
+            if (itemIndex !== -1) {
+                const item = this.items[itemIndex];
+                const newVariant = item.variants?.find(v => v.id === newVariantId);
+                
+                if (newVariant) {
+                    const existingIndex = this.items.findIndex(i => i.product_id === productId && i.variant_id === newVariantId);
+                    
+                    if (existingIndex !== -1 && existingIndex !== itemIndex) {
+                        this.items[existingIndex].quantity += item.quantity;
+                        this.items.splice(itemIndex, 1);
+                    } else {
+                        item.variant_id = newVariant.id;
+                        item.variant_label = newVariant.label;
+                        item.price = parseFloat(newVariant.price ? newVariant.price : item.price);
+                        item.max_stock = newVariant.stock_quantity;
+                        
+                        if (item.quantity > item.max_stock) {
+                            item.quantity = item.max_stock;
+                        }
+                    }
                     this.saveCart();
                 }
             }
